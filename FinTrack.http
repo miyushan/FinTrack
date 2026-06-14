@@ -1,6 +1,13 @@
 @FinTrack_HostAddress = http://localhost:5114
 
-GET {{FinTrack_HostAddress}}/weatherforecast/
+### Get company details by stock symbol
+GET {{FinTrack_HostAddress}}/api/company/AAPL
+Accept: application/json
+
+###
+
+### Get top movers (gainers, losers, most active)
+GET {{FinTrack_HostAddress}}/api/mover/top-movers
 Accept: application/json
 
 ###
