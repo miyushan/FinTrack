@@ -1,36 +1,46 @@
+using FinTrack.ExternalServices.AlphaVantage;
+using FinTrack.ExternalServices.Interfaces;
 using FinTrack.Options;
 using FinTrack.Repositories;
 using FinTrack.Repositories.Interfaces;
+using FinTrack.Services;
+using FinTrack.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Options
 builder.Services.AddOptions<AlphaVantageOptions>()
     .Bind(builder.Configuration.GetSection("AlphaVantage"))
     .Validate(o => !string.IsNullOrWhiteSpace(o.ApiKey), "API key is required")
-    .Validate(o => !string.IsNullOrWhiteSpace(o.BaseUrl), "BaseUrl is required")
     .ValidateOnStart();
 
-// Dependency Injection (DI)
+// Repositories
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+
+// Services
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+
+// HttpClient
+builder.Services.AddHttpClient<IStockApiClient, AlphaVantageClient>(client =>
+{
+    var baseUrl = builder.Configuration["AlphaVantage:BaseUrl"]
+              ?? throw new InvalidOperationException("AlphaVantage BaseUrl not configured.");
+
+    client.BaseAddress = new Uri(baseUrl);
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
