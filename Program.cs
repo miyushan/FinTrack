@@ -29,9 +29,11 @@ builder.Services.AddSwaggerGen(options =>
 
 // Repositories
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IMoverRepository, MoverRepository>();
 
 // Services
 builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IMoverService, MoverService>();
 
 // HttpClient
 builder.Services.AddHttpClient<IStockApiClient, AlphaVantageClient>(client =>

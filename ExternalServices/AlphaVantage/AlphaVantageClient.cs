@@ -1,6 +1,7 @@
 ﻿using FinTrack.Domain;
 using FinTrack.ExternalServices.AlphaVantage.Models;
 using FinTrack.ExternalServices.Interfaces;
+using System.Globalization;
 using System.Text.Json;
 
 namespace FinTrack.ExternalServices.AlphaVantage
@@ -52,9 +53,41 @@ namespace FinTrack.ExternalServices.AlphaVantage
             };
         }
 
-        public Task<IEnumerable<Mover>> FetchTopMoversAsync()
+        public async Task<IEnumerable<Mover>> FetchTopMoversAsync()
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.GetAsync($"query?function=TOP_GAINERS_LOSERS&apikey={_apiKey}");
+            response.EnsureSuccessStatusCode();
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var apiData = JsonSerializer.Deserialize<TopMoversResponse>(jsonResponse);
+
+            var newMovers = new List<Mover>();
+
+            if (apiData == null) return newMovers;
+
+            MapAndAddMovers(apiData.TopGainers, MoverCategory.Gainer, newMovers);
+            MapAndAddMovers(apiData.TopLosers, MoverCategory.Loser, newMovers);
+            MapAndAddMovers(apiData.MostActivelyTraded, MoverCategory.Active, newMovers);
+
+            return newMovers;
+        }
+
+        private void MapAndAddMovers(IEnumerable<ApiMover>? sourceList, MoverCategory category, List<Mover> targetList)
+        {
+            if (sourceList == null) return;
+
+            foreach (var apiMover in sourceList.Take(10))
+            {
+                targetList.Add(new Mover
+                {
+                    Ticker = apiMover.Ticker,
+                    Price = decimal.Parse(apiMover.Price, CultureInfo.InvariantCulture),
+                    ChangeAmount = decimal.Parse(apiMover.ChangeAmount, CultureInfo.InvariantCulture),
+                    ChangePercentage = apiMover.ChangePercentage,
+                    Volume = long.Parse(apiMover.Volume, CultureInfo.InvariantCulture),
+                    Category = category
+                });
+            }
         }
     }
 }
