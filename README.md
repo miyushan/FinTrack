@@ -182,3 +182,12 @@ If you encounter the following error:
 This means the daily limit has been reached for your current IP. You can:
 - **Switch to a different network** (e.g. mobile hotspot) to get a fresh IP and continue testing
 - **Use cached data**, if the data was already fetched once, it will be served from the database without hitting the API
+
+## Notes
+Unit tests for the Service Layer have been included in the `Tests` folder for 
+reference. However, they cannot be executed directly from this repository due 
+to project structure constraints(the solution and project share the same 
+directory), which prevents the test project from being added to the same 
+solution without affecting the Git history.
+
+The test project is maintained in a separate repository.
