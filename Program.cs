@@ -1,4 +1,6 @@
 using FinTrack.Options;
+using FinTrack.Repositories;
+using FinTrack.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,9 @@ builder.Services.AddOptions<AlphaVantageOptions>()
     .Validate(o => !string.IsNullOrWhiteSpace(o.ApiKey), "API key is required")
     .Validate(o => !string.IsNullOrWhiteSpace(o.BaseUrl), "BaseUrl is required")
     .ValidateOnStart();
+
+// Dependency Injection (DI)
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 
 var app = builder.Build();
 
