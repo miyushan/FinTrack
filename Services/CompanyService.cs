@@ -24,7 +24,7 @@ namespace FinTrack.Services
             if(company == null)
             {
                 // fetch from external api
-                company = await _apiClient.FetchCompanyDetailAsync();
+                company = await _apiClient.FetchCompanyDetailAsync(symbol);
 
                 if (company != null)
                 {

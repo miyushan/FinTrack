@@ -9,13 +9,23 @@ using FinTrack.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 
 // Options
 builder.Services.AddOptions<AlphaVantageOptions>()
     .Bind(builder.Configuration.GetSection("AlphaVantage"))
     .Validate(o => !string.IsNullOrWhiteSpace(o.ApiKey), "API key is required")
     .ValidateOnStart();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "FinTrack",
+        Version = "v1",
+        Description = "API for retrieving stock movers and company information"
+    });
+});
 
 // Repositories
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
@@ -36,7 +46,8 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

@@ -5,6 +5,6 @@ namespace FinTrack.ExternalServices.Interfaces
     public interface IStockApiClient
     {
         Task<IEnumerable<Mover>> FetchTopMoversAsync();
-        Task<Company> FetchCompanyDetailAsync();
+        Task<Company?> FetchCompanyDetailAsync(string symbol);
     }
 }
