@@ -95,3 +95,28 @@ CREATE TABLE Companies (
 | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `Movers`    | Stores stock market movers including top gainers, top losers, and most actively traded stocks retrieved from AlphaVantage. |
 | `Companies` | Stores company profiles retrieved from AlphaVantage.                                                                       |
+
+
+### Configure AlphaVantage API
+
+1. Create a free API key from AlphaVantage:
+
+   * Visit https://www.alphavantage.co/support/#api-key
+   * Generate your personal API key.
+
+2. Store the API key using .NET User Secrets:
+
+```bash
+dotnet user-secrets set "AlphaVantage:ApiKey" "YOUR_API_KEY"
+```
+
+Example:
+```bash
+dotnet user-secrets set "AlphaVantage:ApiKey" "8P63H5GNUXPWN1SO"
+```
+
+3. Verify the secret has been stored successfully:
+
+```bash
+dotnet user-secrets list
+```
