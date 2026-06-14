@@ -60,3 +60,38 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=MIYUSHAN\M
 
 > Replace `YOUR_SERVER_NAME` with your local SQL Server instance name.
 
+### Create Database Tables
+
+Execute the following SQL scripts in the `FinTrack_Dev` database:
+
+```sql
+CREATE TABLE Movers (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Ticker NVARCHAR(10) NOT NULL,
+    Price DECIMAL(18,4) NOT NULL,
+    ChangeAmount DECIMAL(18,4) NOT NULL,
+    ChangePercentage NVARCHAR(20) NOT NULL,
+    Volume BIGINT NOT NULL,
+    Category NVARCHAR(20) NOT NULL, -- Gainer, Loser, Active
+    CachedDate DATE DEFAULT CAST(GETUTCDATE() AS DATE)
+);
+
+CREATE TABLE Companies (
+    Symbol NVARCHAR(10) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Description NVARCHAR(MAX) NOT NULL,
+    Exchange NVARCHAR(10) NOT NULL,
+    Currency NVARCHAR(10) NOT NULL,
+    Country NVARCHAR(10) NOT NULL,
+    Sector NVARCHAR(100),
+    Industry NVARCHAR(100),
+    MarketCap BIGINT NOT NULL
+);
+```
+
+#### Table Overview
+
+| Table       | Purpose                                                                                                                    |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `Movers`    | Stores stock market movers including top gainers, top losers, and most actively traded stocks retrieved from AlphaVantage. |
+| `Companies` | Stores company profiles retrieved from AlphaVantage.                                                                       |
