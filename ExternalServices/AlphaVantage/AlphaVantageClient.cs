@@ -1,4 +1,5 @@
-﻿using FinTrack.Domain;
+﻿using FinTrack.Common.Exceptions;
+using FinTrack.Domain;
 using FinTrack.ExternalServices.AlphaVantage.Models;
 using FinTrack.ExternalServices.Interfaces;
 using System.Globalization;
@@ -24,18 +25,19 @@ namespace FinTrack.ExternalServices.AlphaVantage
             response.EnsureSuccessStatusCode();
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            
-            if (string.IsNullOrEmpty(jsonResponse))
+
+            using var jsonDocument = JsonDocument.Parse(jsonResponse);
+            if (jsonDocument.RootElement.TryGetProperty("Information", out var information))
             {
-                return null;
+                throw new ExternalServiceException(information.GetString()!);
             }
+
+            if (string.IsNullOrEmpty(jsonResponse) || jsonResponse.Trim() == "{}")
+                return null;
 
             var apiData = JsonSerializer.Deserialize<CompanyDetailResponse>(jsonResponse);
 
-            if(apiData == null)
-            {
-                return null;
-            }
+            if (apiData == null) return null;
 
             long.TryParse(apiData.MarketCapitalization, out long marketCap);
 

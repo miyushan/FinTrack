@@ -1,5 +1,6 @@
 using FinTrack.ExternalServices.AlphaVantage;
 using FinTrack.ExternalServices.Interfaces;
+using FinTrack.Middlewares;
 using FinTrack.Options;
 using FinTrack.Repositories;
 using FinTrack.Repositories.Interfaces;
@@ -51,6 +52,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// custom middlewares
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

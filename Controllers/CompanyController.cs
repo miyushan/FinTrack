@@ -1,4 +1,5 @@
-﻿using FinTrack.DTOs;
+﻿using FinTrack.Common;
+using FinTrack.DTOs;
 using FinTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,25 +17,24 @@ namespace FinTrack.Controllers
             _companyService = companyService;
         }
 
-        [HttpGet("symbol")]
+        [HttpGet("{symbol}")]
         public async Task<ActionResult<CompanyDto>> GetCompany(string symbol)
         {
             if (string.IsNullOrEmpty(symbol))
             {
-                return BadRequest(new
-                {
-                    Message = "Symbol is required!"
-                });
+                return BadRequest(
+                    new ErrorResponse(StatusCodes.Status400BadRequest, "Symbol is required!")
+                );
             }
 
             var company = await _companyService.GetCompanyDetailAsync(symbol);
 
-            if(company == null)
+            if (company == null)
             {
-                return NotFound(new
-                {
-                    Message = $"Company with symbol {symbol} not found!"
-                });
+                return NotFound(
+                    new ErrorResponse(StatusCodes.Status404NotFound,
+                    $"Company with symbol '{symbol}' not found!")
+                );
             }
 
             return Ok(company);
