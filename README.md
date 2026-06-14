@@ -46,7 +46,17 @@ during development without committing them to source control.
 * Microsoft SQL Server
 * SQL Server Management Studio (SSMS)
 
-### Database Setup
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/miyushan/FinTrack.git
+cd FinTrack
+```
+
+### 2. Database Setup
+
 1. Open SQL Server Management Studio (SSMS).
 2. Create a new database(FinTrack_Dev) using:
 
@@ -54,31 +64,7 @@ during development without committing them to source control.
 CREATE DATABASE FinTrack_Dev;
 ```
 
-### Configure User Secrets
-
-1. Navigate to the project directory and initialize User Secrets:
-
-```bash
-dotnet user-secrets init
-```
-
-2. Configure the connection string using .NET User Secrets:
-
-```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=YOUR_SERVER_NAME;Database=FinTrack_Dev;Trusted_Connection=True;TrustServerCertificate=True;"
-```
-
-Example:
-
-```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=MIYUSHAN\MSSQLSERVER01;Database=FinTrack_Dev;Trusted_Connection=True;TrustServerCertificate=True;"
-```
-
-> Replace `YOUR_SERVER_NAME` with your local SQL Server instance name.
-
-### Create Database Tables
-
-Execute the following SQL scripts in the `FinTrack_Dev` database:
+Then execute the following scripts in the `FinTrack_Dev` database:
 
 ```sql
 CREATE TABLE Movers (
@@ -105,70 +91,60 @@ CREATE TABLE Companies (
 );
 ```
 
-#### Table Overview
+| Table | Purpose |
+| --- | --- |
+| `Movers` | Stores stock market movers including top gainers, top losers, and most actively traded stocks retrieved from AlphaVantage. |
+| `Companies` | Stores company profiles retrieved from AlphaVantage. |
 
-| Table       | Purpose                                                                                                                    |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `Movers`    | Stores stock market movers including top gainers, top losers, and most actively traded stocks retrieved from AlphaVantage. |
-| `Companies` | Stores company profiles retrieved from AlphaVantage.                                                                       |
+### 3. Configure User Secrets
 
+Set the database connection string:
 
-### Configure AlphaVantage API
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=YOUR_SERVER_NAME;Database=FinTrack_Dev;Trusted_Connection=True;TrustServerCertificate=True;"
+```
 
-1. Create a free API key from AlphaVantage:
+Example:
 
-   * Visit https://www.alphavantage.co/support/#api-key
-   * Generate your personal API key.
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=MIYUSHAN\MSSQLSERVER01;Database=FinTrack_Dev;Trusted_Connection=True;TrustServerCertificate=True;"
+```
 
-2. Store the API key using .NET User Secrets:
+> Replace `YOUR_SERVER_NAME` with your local SQL Server instance name.
+
+### 4. Configure AlphaVantage API Key
+
+Create a free API key at https://www.alphavantage.co/support/#api-key, then store it:
 
 ```bash
 dotnet user-secrets set "AlphaVantage:ApiKey" "YOUR_API_KEY"
 ```
 
-Example:
-```bash
-dotnet user-secrets set "AlphaVantage:ApiKey" "8P63H5GNUXPWN1SO"
-```
-
-3. Verify the secret has been stored successfully:
+Verify all secrets are stored correctly:
 
 ```bash
 dotnet user-secrets list
 ```
 
-## Build & Run
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/miyushan/FinTrack.git
-cd FinTrack
-```
-
-### 2. Restore dependencies
+### 5. Restore & Build
 
 ```bash
 dotnet restore
-```
-
-### 3. Build the project
-
-```bash
 dotnet build
 ```
 
-### 4. Run the API
+### 6. Run the API
 
 ```bash
-dotnet run --project FinTrack
+dotnet run --project FinTrack.csproj
 ```
 
-The API will start at `http://localhost:5114`.
+The terminal will show `Now listening on: http://localhost:5114` when the API
+is ready. **Keep this terminal open** while testing.
 
-### 5. Access the API
+### 7. Access the API
 
-Once running, open your browser and navigate to:
+Open your browser and navigate to:
 
 ```
 http://localhost:5114/swagger
@@ -177,18 +153,17 @@ http://localhost:5114/swagger
 This will open the Swagger UI where you can explore and test all available
 endpoints interactively.
 
-If you want to manually test the APIs, you can access the following endpoints
-using a tool like curl or Postman:
+You can also test manually using curl or Postman:
 
 ```bash
 # Get company details by stock symbol
-GET http://localhost:5114/api/companies/{symbol}
+GET http://localhost:5114/api/company/{symbol}
 
 # Example
-GET http://localhost:5114/api/companies/AAPL
+GET http://localhost:5114/api/company/AAPL
 
 # Get top movers (gainers, losers, most active)
-GET http://localhost:5114/api/movers/top-movers
+GET http://localhost:5114/api/mover/top-movers
 ```
 
 ## API Rate Limits
@@ -196,6 +171,7 @@ GET http://localhost:5114/api/movers/top-movers
 The free tier of AlphaVantage allows **25 requests per day** per IP address.
 
 If you encounter the following error:
+
 ```json
 {
   "statusCode": 503,
@@ -205,3 +181,4 @@ If you encounter the following error:
 
 This means the daily limit has been reached for your current IP. You can:
 - **Switch to a different network** (e.g. mobile hotspot) to get a fresh IP and continue testing
+- **Use cached data**, if the data was already fetched once, it will be served from the database without hitting the API
